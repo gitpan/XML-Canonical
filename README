@@ -1,0 +1,32 @@
+XML/Canonical version 0.01
+==========================
+
+DESCRIPTION
+
+This modules provides an implementation of the w3 Canonical XML Recommendation
+(http://www.w3.org/TR/2001/REC-xml-c14n-20010315)
+It uses XML::LibXML for its DOM tree and XPath nodes.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+XML-LibXML-1.01 (You must have the lastest version.  If it hasn't been
+uploaded to CPAN yet, download from
+http://tjmather.com/XML-LibXML-1.01pre3.tar.gz)
+
+The gnome libxml library, available from http://www.xmlsoft.org
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 T.J. Mather.  XML::Canonical is free software;
+you may redistribute it and/or modify it under the same terms as Perl itself. 
