@@ -10,8 +10,7 @@ my $input1 = "<absolute:correct      xmlns:absolute='http://www.absolute.org/#li
              "</absolute:correct>" .
              "\n";
 
-my $parser = XML::LibXML->new();
-my $doc = $parser->parse_string($input1);
+my $doc = XML::GDOME->createDocFromString($input1);
 my $canon = XML::Canonical->new(comments => 0);
 eval {
   my $canon_output = $canon->canonicalize_document($doc);
@@ -24,8 +23,7 @@ my $input2 = "<absolute:correct      xmlns:absolute='http://www.absolute.org/#li
              "</relative:incorrect>" .
              "</absolute:correct>";
 
-$parser = XML::LibXML->new();
-$doc = $parser->parse_string($input1);
+$doc = XML::GDOME->createDocFromString($input1);
 my @nodes = $doc->findnodes(qq{//self::*[local-name()='absolute']});
 
 eval {

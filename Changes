@@ -1,5 +1,15 @@
 Revision history for Perl extension XML::Canonical.
 
+0.06  Jan 19 2002
+	- Removed hardcoded INPUT_DIR dir that cased t/spec.t
+	    to fail.
+
+0.05  Jan 14 2002
+	- Now uses XML::GDOME instead of XML::LibXML
+	- Fixed bugs related to setting namespaces from invisible
+	    parent nodes.
+	- other bug fixes
+
 0.04  Nov 28 2001
 	- Cleaned up some warning messages
 

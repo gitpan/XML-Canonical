@@ -1,10 +1,9 @@
 # tests for xml attributes
 
 use XML::Canonical;
+use Test;
 
-print "1..5\n";
-
-my $i = 1;
+BEGIN { plan tests => 5 }
 
 my $input1 = "<included    xml:lang='de'>" .
 	     "<notIncluded xml:lang='de'>" . 
@@ -93,13 +92,10 @@ test_xml_attributes($input5, $output5);
 sub test_xml_attributes {
   my ($input, $canon_expect) = @_;
 
-  my $parser = XML::LibXML->new();
-  my $doc = $parser->parse_string($input);
+  my $doc = XML::GDOME->createDocFromString($input);
   my @nodes = $doc->findnodes(qq{(//*[local-name()='included'] | //@*)});
 
   my $canon = XML::Canonical->new(comments => 0);
   my $canon_output = $canon->canonicalize_nodes($doc, \@nodes);
-  print "not " unless $canon_expect eq $canon_output;
-  print "ok $i\n";
-  $i++;
+  ok($canon_output, $canon_expect);
 }

@@ -1,11 +1,14 @@
-XML::Canonical version 0.04
+XML::Canonical version 0.05
 ===========================
 
 DESCRIPTION
 
 This module provides an implementation of the w3 Canonical XML Recommendation
 (http://www.w3.org/TR/2001/REC-xml-c14n-20010315)
-It uses XML::LibXML for its DOM tree and XPath nodes.
+It uses XML::GDOME for its DOM tree and XPath nodes.
+
+The goal is to provide a full XML Security library that implements
+the w3 XML Signature recommendation.
 
 INSTALLATION
 
@@ -20,7 +23,8 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-XML-LibXML-1.30 or greater, available from www.cpan.org
+XML-GDOME-0.75 or greater, available from www.cpan.org
+libgdome-0.7.1pre7 or greater, available from tjmather.com/xml-gdome
 libxml-2.4.8 or greater, available from www.xmlsoft.org
 
 COPYRIGHT AND LICENCE
