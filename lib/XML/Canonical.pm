@@ -229,7 +229,7 @@ sub normalize_pi {
 
 sub normalize_text {
   my ($s) = @_;
-  $s =~ s/([\x0d&<>])/$char_entities{$1}/ge; #"
+  $s =~ s/([\x0d&<>])/$char_entities{$1}/ge;
   return $s;
 }
 
@@ -496,10 +496,14 @@ This module is in early alpha stage.  It is suggested that you look over
 the source code and test cases before using the module.  In addition,
 the API is subject to change.
 
+In furture versions, XML::GDOME may be used for the DOM tree and
+XPath.  See http://tjmather.com/xml-gdome/ for details.
+
 This module implements the lastest w3 recommendation, located at
 http://www.w3.org/TR/2001/REC-xml-c14n-20010315
 
-Parts are adapted from the Java xmlsecurity package.  See http://www.xmlsecurity.org
+Parts are adapted from the Apache XML Security package.
+See http://www.xmlsecurity.org
 
 Comments, suggestions, and patches welcome.
 

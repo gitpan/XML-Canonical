@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::Canonical.
 
+0.03  Nov 26 2001
+        - Updated dependency on XML::LibXML to 1.30
+
 0.02  Oct 02 2001
 	- Checks for relative namespaces.
 	- Processes xml attributes.

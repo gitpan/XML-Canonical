@@ -4,5 +4,5 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     'NAME'		=> 'XML::Canonical',
     'VERSION_FROM'	=> 'lib/XML/Canonical.pm', # finds $VERSION
-    'PREREQ_PM'		=> {XML::LibXML => 1.01}, # e.g., Module::Name => 1.1
+    'PREREQ_PM'		=> {XML::LibXML => 1.30}, # e.g., Module::Name => 1.1
 );
