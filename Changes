@@ -1,5 +1,9 @@
 Revision history for Perl extension XML::Canonical.
 
+0.02  Oct 02 2001
+	- Checks for relative namespaces.
+	- Processes xml attributes.
+
 0.01  Sep 28 2001
 	- original version; created by h2xs 1.21 with options
 		-X -n XML::Canonical

@@ -3,5 +3,7 @@ Changes
 Makefile.PL
 MANIFEST
 README
-t/canon.t
+t/relative_ns.t
+t/spec.t
+t/xmlattr.t
 world.txt

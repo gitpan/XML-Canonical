@@ -1,5 +1,16 @@
-XML/Canonical version 0.01
+XML/Canonical version 0.02
 ==========================
+
+IMPORTANT NOTE
+
+This module requires the following packages:
+
+libxml2 2.4.6, available from http://www.xmlsoft.org
+	If 2.4.6 is not available yet, use CVS snapshot.
+
+XML-LibXML 1.01, available from http://www.cpan.org
+	If 1.01 is not available yet, use
+	http://tjmather.com/XML-LibXML-1.01pre4.tar.gz
 
 DESCRIPTION
 
@@ -20,11 +31,8 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-XML-LibXML-1.01 (You must have the lastest version.  If it hasn't been
-uploaded to CPAN yet, download from
-http://tjmather.com/XML-LibXML-1.01pre3.tar.gz)
-
-The gnome libxml library, available from http://www.xmlsoft.org
+XML-LibXML-1.01, available from CPAN
+libxml-2.4.6, available from www.xmlsoft.org
 
 COPYRIGHT AND LICENCE
 

@@ -1,3 +1,5 @@
+# tests for examples in w3 recommendation
+
 use XML::Canonical;
 
 print "1..7\n";
@@ -20,6 +22,8 @@ my $canon_output = $canon->canonicalize_string($input);
 print "not " unless $canon_expect eq $canon_output;
 print "ok 7\n";
 
+# we currently don't test this b/c XML::LibXML doesn't have
+# support for setting namespaces in xpath context
 #my $input = slurp("t/in/37_input.xml");
 #my $canon_expect = slurp("t/in/37_c14n.xml");
 #chomp($canon_expect);

@@ -8,9 +8,10 @@ use constant AFTER_DOCUMENT_ELEM => 2;
 use constant XPATH_C14N_WITH_COMMENTS => '(//. | //@* | //namespace::*)';
 use constant XPATH_C14N_OMIT_COMMENTS =>
                XPATH_C14N_WITH_COMMENTS . '[not(self::comment())]';
+use constant XML_NS => 'http://www.w3.org/XML/1998/namespace';
 
 use vars qw($VERSION %char_entities);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 %char_entities = ( 
 		  '&' => '&amp;',
@@ -24,8 +25,6 @@ $VERSION = '0.01';
 
 use XML::LibXML;
 use Data::Dumper;
-
-XML::LibXML->complete_attributes(1);
 
 sub new {
   my ($class, %opt) = @_;
@@ -44,8 +43,8 @@ sub canonicalize_string {
 
 sub canonicalize_document {
   my ($self, $doc) = @_;
-  my @nodes = $self->{comments} ? $doc->findnodes(XPATH_C14N_WITH_COMMENTS) :
-    $doc->findnodes(XPATH_C14N_OMIT_COMMENTS);
+  my @nodes = $self->{comments} ?  $doc->findnodes(XPATH_C14N_WITH_COMMENTS) :
+    $doc->findnodes(XPATH_C14N_OMIT_COMMENTS );
   $self->{visible_nodes} = {};
   for (@nodes) {
     $self->{visible_nodes}->{$_->getPointer} = 1;
@@ -56,12 +55,11 @@ sub canonicalize_document {
 }
 
 sub canonicalize_nodes {
-  my ($self, $nodes) = @_;
+  my ($self, $doc, $nodes) = @_;
   $self->{visible_nodes} = {};
   for (@$nodes) {
     $self->{visible_nodes}->{$_->getPointer} = 1;
   }
-  my $doc = $nodes->[0]->getOwner;
   $doc->setEncoding("UTF-8");
   $self->process($doc);
   return $self->{output};
@@ -117,11 +115,11 @@ sub process {
   } elsif ($type == XML_ELEMENT_NODE) {
     $self->{processing_pos} = INSIDE_DOCUMENT_ELEM if $is_document_element;
     # XXX - put in a check for relative namespaces
-#    check_for_relative_namespace($node);
+    check_for_relative_namespace($node);
 
     if ($self->engine_visible($node)) {
       $self->print("<" . $node->getName());
-#      $self->process_xml_attributes($node);
+      $self->process_xml_attributes($node);
       $self->process_namespaces($node);
       for my $attr (sort attr_compare $node->getAttributes) {
 	$self->print(' ' . $attr->getName . '="' . normalize_attr($attr->getData) . '"')
@@ -241,8 +239,8 @@ sub check_for_relative_namespace {
     my $node_attr_name = $attr->getName();
     if ($node_attr_name eq 'xmlns' || $node_attr_name =~ /^xmlns:/){
       # assume empty namespaces are absolute
-      return 1 unless $node_attr_name;
       my $attr_value = $attr->getData;
+      return 1 unless $attr_value;
       unless ($attr_value =~ m!^\w+://[\w.]+!){
 	my $name = $node->getName;
 	die qq{Relative namespace for <$name $node_attr_name="$attr_value">};
@@ -251,10 +249,68 @@ sub check_for_relative_namespace {
   }
 }
 
+sub get_ancestor_elements {
+  my ($self, $node) = @_;
+  my $parent_node = $node;
+  my @parent_nodes;
+  while ($parent_node = $parent_node->getParentNode) {
+    last if $parent_node->getType != XML_ELEMENT_NODE;
+    push @parent_nodes, $parent_node;
+  }
+  return \@parent_nodes;
+}
+
 sub process_xml_attributes {
   my ($self, $node) = @_;
-  # TODO
+  my $parent_nodes = $self->get_ancestor_elements($node);
 
+  my %used_xml_attributes;
+  for my $parent_node (@$parent_nodes) {
+    for my $attr ($parent_node->getAttributes) {
+      my $name = $attr->getName;
+      $used_xml_attributes{$name} = 1 if $name =~ m!^xml:!;
+    }
+  }
+
+  for my $attr_name (keys %used_xml_attributes) {
+    my $ctx_attr_value;
+    my ($attr_local_name) = ($attr_name =~ m!^xml:(.*)!);
+    if (!defined($node->getAttributeNS(XML_NS,$attr_local_name))) {
+      for my $parent_node (@$parent_nodes) {
+	my $attr_value;
+	# XXX: getAttribute doesn't work here...
+	for ($parent_node->getAttributes) {
+	  $attr_value = $_->getValue if $_->getName eq $attr_name;
+	}
+	if (!$self->engine_visible($parent_node) && !defined($ctx_attr_value)) {
+	  $ctx_attr_value = $attr_value;
+	} elsif ($self->engine_visible($parent_node) && defined($ctx_attr_value)
+		&& defined($attr_value)) {
+	  if ($ctx_attr_value eq $attr_value) {
+	    $ctx_attr_value = undef;
+	  }
+	  last;
+	}
+      }
+    } else {
+      $ctx_attr_value = $node->getAttributeNS(XML_NS,$attr_local_name);
+      for my $parent_node (@$parent_nodes) {
+	if ($self->engine_visible($parent_node) &&
+	    defined($parent_node->getAttributeNS(XML_NS,$attr_local_name))) {
+	  if ($ctx_attr_value eq $parent_node->getAttributeNS(XML_NS,$attr_local_name)) {
+	    $ctx_attr_value = undef;
+	    # delete orig attr XXX
+	    $self->engine_make_invisible($node->getAttributeNodeNS(XML_NS,$attr_local_name));
+	  }
+	  last;
+	}
+      }
+    }
+    if (defined($ctx_attr_value)) {
+      $node->setAttributeNS(XML_NS,$attr_name, $ctx_attr_value);
+      $self->engine_make_visible($node->getAttributeNodeNS(XML_NS,$attr_local_name));
+    }
+  }
 }
 
 sub process_namespaces {
@@ -400,6 +456,9 @@ XML::Canonical - Perl Implementation of Canonical XML
   $canon_xml = $canon->canonicalize_string($xml_string);
   $canon_xml = $canon->canonicalize_document($libxml_document);
 
+  my @nodes = $doc->findnodes(qq{(//*[local-name()='included'] | //@*)});
+  my $canon_output = $canon->canonicalize_nodes($doc, \@nodes);
+
 =head1 DESCRIPTION
 
 This modules provides an implementation of Canonical XML Recommendation
@@ -424,13 +483,12 @@ Reads in an XML string and outputs its canonical form.
 
 Reads in a XML::LibXML::Document object and returns its canonical form.
 
+=item $output = $canon->canonicalize_nodes( $libxml_doc, $nodes );
+
+Reads in a XML::LibXML::Document object and an array reference to
+a set of visible nodes returns the canonical form of the selected nodes.
+
 =back
-
-=head1 BUGS
-
-Doesn't remove superfluous attributes begining with xml:
-
-Doesn't check for relative namespaces.
 
 =head1 NOTES
 
@@ -440,7 +498,8 @@ the API is subject to change.
 
 This module implements the lastest w3 recommendation, located at
 http://www.w3.org/TR/2001/REC-xml-c14n-20010315
-L<XML::CanonXMLWriter> implements James Clark's Canonical XML definition.
+
+Parts are adapted from the Java xmlsecurity package.  See http://www.xmlsecurity.org
 
 Comments, suggestions, and patches welcome.
 
