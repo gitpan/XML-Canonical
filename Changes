@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::Canonical.
 
+0.04  Nov 28 2001
+	- Cleaned up some warning messages
+
 0.03  Nov 26 2001
         - Updated dependency on XML::LibXML to 1.30
 

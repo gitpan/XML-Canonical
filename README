@@ -1,9 +1,9 @@
-XML::Canonical version 0.03
+XML::Canonical version 0.04
 ===========================
 
 DESCRIPTION
 
-This modules provides an implementation of the w3 Canonical XML Recommendation
+This module provides an implementation of the w3 Canonical XML Recommendation
 (http://www.w3.org/TR/2001/REC-xml-c14n-20010315)
 It uses XML::LibXML for its DOM tree and XPath nodes.
 

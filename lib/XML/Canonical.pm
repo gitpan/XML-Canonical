@@ -11,7 +11,7 @@ use constant XPATH_C14N_OMIT_COMMENTS =>
 use constant XML_NS => 'http://www.w3.org/XML/1998/namespace';
 
 use vars qw($VERSION %char_entities);
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 %char_entities = ( 
 		  '&' => '&amp;',
@@ -122,8 +122,11 @@ sub process {
       $self->process_xml_attributes($node);
       $self->process_namespaces($node);
       for my $attr (sort attr_compare $node->getAttributes) {
-	$self->print(' ' . $attr->getName . '="' . normalize_attr($attr->getData) . '"')
-	  if ($self->engine_visible($attr));
+	if ($self->engine_visible($attr)) {
+          my $normalized_attr = normalize_attr($attr->getData);
+	  $normalized_attr = '' unless defined($normalized_attr);
+	  $self->print(' ' . $attr->getName . '="' . $normalized_attr . '"');
+        }
       }
       $self->print(">");
     }
@@ -215,7 +218,7 @@ sub attr_compare {
 
 sub normalize_attr {
   my ($s) = @_;
-  $s =~ s/([\x09\x0a\x0d&<"])/$char_entities{$1}/ge; #"
+  $s =~ s/([\x09\x0a\x0d&<"])/$char_entities{$1}/ge if defined($s); #"
   return $s;
 }
 
@@ -344,7 +347,7 @@ sub process_namespaces {
 	}
       }
     } else {
-      if ( length($node_ns_value) > 0) {
+      if ( defined($node_ns_value) && length($node_ns_value) > 0) {
 	# case 3
 	my $parent_node = $node;
 	while ($parent_node = $parent_node->getParentNode) {
@@ -461,7 +464,7 @@ XML::Canonical - Perl Implementation of Canonical XML
 
 =head1 DESCRIPTION
 
-This modules provides an implementation of Canonical XML Recommendation
+This module provides an implementation of Canonical XML Recommendation
 (Version 1, 15 March 2001).  It uses L<XML::LibXML> for its DOM tree and
 XPath nodes.
 
@@ -503,7 +506,7 @@ This module implements the lastest w3 recommendation, located at
 http://www.w3.org/TR/2001/REC-xml-c14n-20010315
 
 Parts are adapted from the Apache XML Security package.
-See http://www.xmlsecurity.org
+See http://xml.apache.org/security/
 
 Comments, suggestions, and patches welcome.
 
@@ -518,6 +521,6 @@ you may redistribute it and/or modify it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<XML::LibXML>, L<XML::CanonXMLWriter>.
+L<XML::LibXML>, L<XML::Handler::CanonXMLWriter>.
 
 =cut
