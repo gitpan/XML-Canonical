@@ -1,1 +1,2 @@
-- Add signature classes
+- Add signature classes, will make thin XS wrapper around
+XMLSec Library - see http://www.aleksey.com/xmlsec/

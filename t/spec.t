@@ -37,15 +37,8 @@ my $res = $doc->xpath_evaluate(qq{
    count(id("E3")|ancestor-or-self::node()) = count(ancestor-or-self::node())
 ]
 }, $nsresolv);
-my $si = $res->getSetIterator(0);
-my @nodes;
-my $node = $si->nextNode;
-while (defined($node)) {
-  push @nodes, $node;
-  $node = $si->nextNode;
-}
 
-$canon_output = $canon->canonicalize_nodes($doc, \@nodes);
+$canon_output = $canon->canonicalize_document($doc, $res);
 ok($canon_output, $canon_expect);
 
 sub slurp {

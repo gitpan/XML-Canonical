@@ -1,5 +1,8 @@
 Revision history for Perl extension XML::Canonical.
 
+0.10  Apr 21 2002
+	- Rewrote to use new XML Canonical code in libxml2.
+
 0.06  Jan 19 2002
 	- Removed hardcoded INPUT_DIR dir that cased t/spec.t
 	    to fail.
